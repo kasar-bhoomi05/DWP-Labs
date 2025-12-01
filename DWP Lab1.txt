@@ -1,0 +1,144 @@
+csv = """
+Name,Age,City
+Bhoomi,20,Pune
+Amit,22,Mumbai
+"""
+with open("sample.csv", "w") as f:
+    f.write(csv)
+
+df_sample = pd.read_csv("sample.csv")
+print(df_sample.head())
+
+import pandas as pd
+df = pd.read_csv(r'C:\Users\Bhoomi\Downloads\zara.csv', sep = ';')
+print(df.head())
+
+df.to_csv("exported_data.csv", index = False)
+print("Exported succesfully")
+
+excel = pd.DataFrame({
+    "Name": ["Bhoomi", "Amit"],
+    "Age": [20, 22],
+    "City": ["Pune", "Mumbai"]
+})
+print(excel.head())
+excel.to_excel("sample.xlsx", index=False)
+
+df_excel.to_csv("exported_data.excel", index = False)
+
+import pandas as pd
+df_excel = pd.read_excel(r"C:\Users\BHOOMI\Downloads\Cola.xlsx")
+print(df_excel.head())
+
+import json
+data = {
+    "Name" : "Bhoomi",
+    "Age" : 20,
+    "Skills" : ["SQL","Python","ML"]
+}
+
+with open("sample.json", "w")as f:
+    json.dump(data, f, indent = 4)
+
+with open("sample.json", "r")as f:
+    data = json.load(f)
+
+print("load success")
+
+df_json = pd.read_json("sample.json")
+print(df_json.head())
+
+df_json.to_json("exported.json", index=False)
+
+import requests
+from bs4 import BeautifulSoup
+
+url = "https://quotes.toscrape.com/"
+response = requests.get(url)
+
+soup = BeautifulSoup(response.text, "html.parser")
+
+quotes = soup.find_all("span", class_="text")
+
+for q in quotes:
+    print(q.text)
+
+import pandas as pd
+import requests
+
+url = "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5"
+response = requests.get(url)
+
+print(response.status_code)
+
+data = response.json()
+print(type(data))
+
+df = pd.DataFrame(data)
+print(df.head())
+
+# SQL Example: Data Import/Export
+
+import sqlite3
+import pandas as pd
+
+# Connect to SQLite database (or create it)
+conn = sqlite3.connect("mydatabase.db")
+cursor = conn.cursor()
+
+# Create a table
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS students (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    age INTEGER,
+    city TEXT
+)
+""")
+conn.commit()
+
+# Insert data into the table
+students_data = [
+    ("Bhoomi", 20, "Pune"),
+    ("Amit", 22, "Mumbai"),
+    ("Sara", 21, "Delhi")
+]
+
+for student in students_data:
+    cursor.execute("INSERT INTO students (name, age, city) VALUES (?, ?, ?)", student)
+
+conn.commit()
+
+# Query data from the table
+print("All students:")
+cursor.execute("SELECT * FROM students")
+rows = cursor.fetchall()
+for row in rows:
+    print(row)
+
+print("\nStudents older than 20:")
+cursor.execute("SELECT name, city FROM students WHERE age > 20")
+filtered = cursor.fetchall()
+print(filtered)
+
+# Load SQL data into pandas DataFrame
+df = pd.read_sql_query("SELECT * FROM students", conn)
+print("\nDataFrame from SQL table:")
+print(df.head())
+
+# Update / Delete example
+cursor.execute("UPDATE students SET age = 21 WHERE name = 'Bhoomi'")
+cursor.execute("DELETE FROM students WHERE name = 'Amit'")
+conn.commit()
+
+# Check updated table
+print("\nUpdated table after changes:")
+df_updated = pd.read_sql_query("SELECT * FROM students", conn)
+print(df_updated)
+
+# Save DataFrame to CSV and Excel
+df_updated.to_csv("students_data.csv", index=False)
+df_updated.to_excel("students_data.xlsx", index=False)
+
+# Close the connection
+conn.close()

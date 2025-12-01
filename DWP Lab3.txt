@@ -1,0 +1,45 @@
+#  DATA TRANSFORMATION: STRING, REGEX, DATE/TIME, RESHAPING
+
+import pandas as pd
+import numpy as np
+
+# 1. CREATE SAMPLE DATA
+data = {
+    'Name': ['Alice Johnson', 'Bob Smith', 'Carol White', 'David Brown', 'Eve Black'],
+    'Email': ['alice@gmail.com', 'bob_smith@yahoo.com', 'carol.white@hotmail.com', 'david123@outlook.com', 'eve.black@gmail.com'],
+    'Joining_Date': ['2023-01-15', '2022-11-30', '2023-05-20', '2021-08-10', '2022-12-05'],
+    'Department': ['HR', 'Finance', 'IT', 'IT', 'Finance'],
+    'Salary': [50000, 60000, 55000, 70000, 48000]
+}
+
+df = pd.DataFrame(data)
+print("Original Data:\n", df)
+
+# 2. STRING MANIPULATION
+df['Name_upper'] = df['Name'].str.upper()                # Convert Name to uppercase
+df['First_Name'] = df['Name'].str.split().str[0]        # Extract first name
+df['Email_new'] = df['Email'].str.replace('gmail.com', 'company.com', regex=False)  # Replace email domain
+df['Is_IT'] = df['Department'].str.contains('IT')       # Check if department is IT
+
+# 3. REGULAR EXPRESSIONS
+df['Email_number'] = df['Email'].str.extract('(\d+)')   # Extract numbers from email
+df['Gmail'] = df['Email'].str.contains(r'@gmail\.com$') # Check emails ending with gmail.com
+
+# 4. DATE/TIME HANDLING
+df['Joining_Date'] = pd.to_datetime(df['Joining_Date'])  # Convert to datetime
+df['Join_Year'] = df['Joining_Date'].dt.year             # Extract year
+df['Join_Month'] = df['Joining_Date'].dt.month           # Extract month
+df['Join_Day'] = df['Joining_Date'].dt.day               # Extract day
+df['Experience_Days'] = (pd.Timestamp('2025-11-30') - df['Joining_Date']).dt.days  # Experience in days
+
+# 5. RESHAPING DATA
+# Pivot table: Average Salary by Department
+pivot = df.pivot_table(values='Salary', index='Department', aggfunc='mean')
+
+# Melt DataFrame: Wide → Long format
+melted = pd.melt(df, id_vars=['Name'], value_vars=['Salary', 'Experience_Days'])
+
+# 6. SHOW RESULTS
+print("\nAfter Transformation:\n", df)
+print("\nPivot Table (Avg Salary by Department):\n", pivot)
+print("\nMelted DataFrame:\n", melted)

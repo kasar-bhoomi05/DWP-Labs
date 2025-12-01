@@ -1,0 +1,47 @@
+# BASIC DATA CLEANING WITH SAMPLE CSV
+
+import pandas as pd
+import numpy as np
+
+# 1. CREATE SAMPLE DATA
+data = {
+    'Name': ['Alice', 'Bob', 'Carol', 'David', 'Eve'],
+    'Age': [25, np.nan, 30, -5, 22],          # Missing value and negative age
+    'Gender': ['Female', 'Male', np.nan, 'Male', 'Female'],  # Missing gender
+    'Salary': [50000, 60000, 550000, 200000, 48000]  # Outlier salary (550000)
+}
+
+df = pd.DataFrame(data)
+
+# 2. HANDLE MISSING VALUES
+df['Age'] = df['Age'].fillna(df['Age'].mean())
+df['Gender'] = df['Gender'].fillna(df['Gender'].mode()[0])
+
+# 3. HANDLE OUTLIERS (IQR METHOD)
+Q1 = df['Salary'].quantile(0.25)
+Q3 = df['Salary'].quantile(0.75)
+IQR = Q3 - Q1
+
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+
+# Cap outliers
+df['Salary'] = np.where(df['Salary'] > upper_bound, upper_bound,
+                        np.where(df['Salary'] < lower_bound, lower_bound, df['Salary']))
+
+# 4. BASIC DATA VALIDATION
+# Age should be positive
+df = df[df['Age'] > 0]
+
+# Gender should be Male or Female
+df = df[df['Gender'].isin(['Male', 'Female'])]
+
+# Remove duplicates
+df = df.drop_duplicates()
+
+# 5. SHOW CLEANED DATA
+print("\nCleaned Data:\n", df)
+
+# Save cleaned data
+df.to_csv("sample_data_cleaned.csv", index=False)
+print("\nCleaned data saved as 'sample_data_cleaned.csv'")

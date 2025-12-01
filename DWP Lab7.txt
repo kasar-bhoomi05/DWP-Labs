@@ -1,0 +1,46 @@
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+
+# Sample dataset
+df = pd.DataFrame({
+    'Gender': ['Male', 'Female', 'Female', 'Male', 'Female'],
+    'City': ['Mumbai', 'Delhi', 'Delhi', 'Pune', 'Mumbai'],
+    'Age': [25, 30, 22, 28, 35],
+    'Purchased': [0, 1, 0, 1, 1]
+})
+
+# ------------ Label Encoding ------------
+df_le = df.copy()
+le = LabelEncoder()
+df_le['Gender'] = le.fit_transform(df_le['Gender'])
+df_le['City'] = le.fit_transform(df_le['City'])
+
+# ------------ One-Hot Encoding ------------
+df_ohe = pd.get_dummies(df, columns=['Gender', 'City'], drop_first=True)
+
+# ------------ Train/Test Split ------------
+X_le = df_le.drop('Purchased', axis=1)
+y_le = df_le['Purchased']
+
+X_ohe = df_ohe.drop('Purchased', axis=1)
+y_ohe = df_ohe['Purchased']
+
+X_train_le, X_test_le, y_train_le, y_test_le = train_test_split(X_le, y_le, test_size=0.3)
+X_train_ohe, X_test_ohe, y_train_ohe, y_test_ohe = train_test_split(X_ohe, y_ohe, test_size=0.3)
+
+# ------------ Logistic Regression ------------
+lr_le = LogisticRegression().fit(X_train_le, y_train_le)
+lr_ohe = LogisticRegression().fit(X_train_ohe, y_train_ohe)
+
+# ------------ Random Forest ------------
+rf_le = RandomForestClassifier().fit(X_train_le, y_train_le)
+rf_ohe = RandomForestClassifier().fit(X_train_ohe, y_train_ohe)
+
+# ------------ Accuracy ------------
+print("LR + Label Encoding Accuracy :", lr_le.score(X_test_le, y_test_le))
+print("LR + One-Hot Encoding Accuracy:", lr_ohe.score(X_test_ohe, y_test_ohe))
+print("RF + Label Encoding Accuracy  :", rf_le.score(X_test_le, y_test_le))
+print("RF + One-Hot Encoding Accuracy :", rf_ohe.score(X_test_ohe, y_test_ohe))

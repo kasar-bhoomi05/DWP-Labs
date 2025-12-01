@@ -1,0 +1,42 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+from imblearn.over_sampling import SMOTE
+
+# ---------------- Dataset ----------------
+data = {
+    'Age':    [22,25,47,52,46,56,23,34,44,21,33,29,49,51,53],
+    'Salary': [20,25,47,52,46,56,23,34,44,21,39,28,50,48,55],
+    'Purchased': [0,0,1,1,1,1,0,0,1,0,0,0,1,1,1]
+}
+
+df = pd.DataFrame(data)
+
+# ---------------- Features & Target ----------------
+X = df[['Age', 'Salary']]
+y = df['Purchased']
+
+print("Class distribution BEFORE SMOTE:")
+print(y.value_counts())
+
+# ---------------- Train/Test Split ----------------
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+# ---------------- Apply SMOTE ----------------
+sm = SMOTE(k_neighbors=3)
+X_train_sm, y_train_sm = sm.fit_resample(X_train, y_train)
+
+print("\nClass distribution AFTER SMOTE:")
+print(y_train_sm.value_counts())
+
+# ---------------- Train Model ----------------
+model = LogisticRegression()
+model.fit(X_train_sm, y_train_sm)
+
+# ---------------- Evaluation ----------------
+y_pred = model.predict(X_test)
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
